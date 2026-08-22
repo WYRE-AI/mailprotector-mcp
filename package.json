@@ -36,13 +36,13 @@
     "@wyre-technology/node-mailprotector": "^1.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/client": "^2.0.0-beta.5",
-    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/github": "^12.0.8",
     "@semantic-release/npm": "^13.1.4",
     "@types/node": "^26.0.1",
-    "eslint": "^9.39.4",
+    "eslint": "^10.8.1",
     "globals": "^17.6.0",
     "semantic-release": "^25.0.0",
     "typescript": "^6.0.3",
