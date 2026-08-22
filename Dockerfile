@@ -1,6 +1,6 @@
 # Multi-stage build for efficient container size.
 # Build with: docker build --platform linux/amd64 --build-arg NODE_AUTH_TOKEN=$(gh auth token) -t mailprotector-mcp .
-FROM node:22-alpine AS builder
+FROM node:26-alpine AS builder
 
 # Build arguments
 ARG VERSION="unknown"
@@ -31,7 +31,7 @@ RUN npm run build
 RUN npm prune --omit=dev && npm cache clean --force
 
 # Production stage
-FROM node:22-alpine AS production
+FROM node:26-alpine AS production
 
 # Pull latest Alpine package fixes even when the base layer is cached
 RUN apk -U upgrade --no-cache
