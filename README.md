@@ -68,7 +68,7 @@ through to env credentials.
 ## Running
 
 ```bash
-export NODE_AUTH_TOKEN=$(gh auth token)   # GitHub Packages auth for @wyre-technology/*
+export NODE_AUTH_TOKEN=$(gh auth token)   # GitHub Packages auth for @wyre-ai/* + @wyre-technology/*
 npm install
 npm run build
 node dist/index.js                        # stdio (default)
