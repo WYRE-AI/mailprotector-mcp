@@ -13,6 +13,7 @@ import {
   resolveGatewayCredentials,
 } from "./mcp-server.js";
 import { logger } from "./utils/logger.js";
+import { verifyS2sHeader, S2S_HEADER } from "./s2s-verify.js";
 
 const CORS_ALLOW_HEADERS = [
   "Content-Type",
@@ -22,6 +23,8 @@ const CORS_ALLOW_HEADERS = [
   "Mcp-Protocol-Version",
   ...GATEWAY_HEADERS,
 ].join(", ");
+
+const S2S_SECRET = process.env.CONDUIT_S2S_SECRET || "";
 
 export interface HttpStack {
   server: NodeHttpServer;
@@ -76,6 +79,29 @@ export function createHttpStack(options: { gatewayMode: boolean }): HttpStack {
     }
 
     if (url.pathname === "/mcp") {
+      // S2S gate: reject requests not signed by the conduit gateway, before
+      // any other processing (gateway#377 parity) — closes the
+      // confused-deputy gap where a compromised sibling sidecar in the
+      // shared ACA environment could otherwise impersonate the gateway to
+      // this container. Empty CONDUIT_S2S_SECRET means enforcement is
+      // disabled (dark-by-default, matches the dormant/pre-provisioning
+      // state).
+      if (S2S_SECRET && !verifyS2sHeader(req.headers[S2S_HEADER] as string | undefined, S2S_SECRET)) {
+        res.writeHead(401, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            jsonrpc: "2.0",
+            error: {
+              code: -32002,
+              message:
+                "Missing or invalid X-Gateway-S2S header: this endpoint only accepts requests signed by the gateway.",
+            },
+            id: null,
+          })
+        );
+        return;
+      }
+
       // 401 gate: reject unauthenticated gateway traffic BEFORE serving —
       // falling through to env-configured credentials would serve the
       // operator's tenant data to whoever asked (cross-tenant leak).
