@@ -96,6 +96,11 @@ async function gatewayLeg(expectedToolCount) {
       MCP_TRANSPORT: 'http',
       MCP_HTTP_PORT: String(GATEWAY_PORT),
       MCP_HTTP_HOST: '127.0.0.1',
+      // Loopback smoke has no gateway signer. Empty secret plus the dev bypass
+      // is the only way this process may listen; a real secret would 401
+      // every unsigned /mcp request below.
+      CONDUIT_S2S_SECRET: '',
+      MCP_ALLOW_INSECURE_DEV: '1',
       LOG_LEVEL: 'error',
     },
     stdio: ['ignore', 'inherit', 'inherit'],
@@ -198,6 +203,10 @@ async function main() {
       MCP_TRANSPORT: 'http',
       MCP_HTTP_PORT: String(PORT),
       MCP_HTTP_HOST: '127.0.0.1',
+      // Same loopback bypass as the gateway leg. Do not inherit a developer
+      // CONDUIT_S2S_SECRET — these requests are unsigned.
+      CONDUIT_S2S_SECRET: '',
+      MCP_ALLOW_INSECURE_DEV: '1',
       // env-mode dummy credentials — tools/list never touches the vendor API
       MAILPROTECTOR_API_KEY: 'smoke-dummy-key',
       MAILPROTECTOR_RESELLER_ID: '42',

@@ -64,9 +64,10 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
-# Set environment variables. AUTH_MODE=gateway is the fleet default: the image
-# ships for hosting behind the WYRE gateway, which injects per-request
-# credential headers. Set AUTH_MODE=env for local env-var credentials.
+# 0.0.0.0 is the in-container bind. Startup still refuses to listen without a
+# real CONDUIT_S2S_SECRET. MCP_ALLOW_INSECURE_DEV=1 refuses this host and only
+# binds 127.0.0.1. AUTH_MODE=gateway never falls back to image env credentials.
+# Set AUTH_MODE=env for local env-var credentials.
 ENV NODE_ENV=production
 ENV LOG_LEVEL=info
 ENV MCP_TRANSPORT=http
